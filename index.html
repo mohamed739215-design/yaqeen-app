@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1e3a5f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>يقين - نظام الحضور المحلي</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- QR Libraries -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash" class="splash">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <i class="fas fa-check-double"></i>
+      </div>
+      <h1>يقين</h1>
+      <p>نظام الحضور المحلي</p>
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <!-- Login Screen -->
+  <div id="login-screen" class="screen hidden">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="logo-circle">
+          <i class="fas fa-check-double"></i>
+        </div>
+        <h1>يقين</h1>
+        <p>نظام تسجيل الحضور والانصراف</p>
+      </div>
+      <div class="login-form">
+        <div class="form-group">
+          <label>رمز الدخول (PIN)</label>
+          <input type="password" id="pin-input" maxlength="6" placeholder="أدخل رمز الدخول" inputmode="numeric" pattern="[0-9]*">
+        </div>
+        <button id="login-btn" class="btn btn-primary btn-block">
+          <i class="fas fa-sign-in-alt"></i> دخول
+        </button>
+        <p class="login-hint" id="login-hint">أول مرة؟ سيتم تعيين الرمز تلقائياً</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="screen hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-top">
+        <button id="menu-btn" class="icon-btn">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="app-title">يقين</h1>
+        <button id="settings-btn" class="icon-btn">
+          <i class="fas fa-cog"></i>
+        </button>
+      </div>
+      <div class="header-date" id="current-date"></div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="scan">
+        <i class="fas fa-qrcode"></i>
+        <span>مسح QR</span>
+      </button>
+      <button class="nav-item" data-page="manual">
+        <i class="fas fa-edit"></i>
+        <span>يدوي</span>
+      </button>
+      <button class="nav-item" data-page="today">
+        <i class="fas fa-calendar-day"></i>
+        <span>اليوم</span>
+      </button>
+      <button class="nav-item" data-page="students">
+        <i class="fas fa-users"></i>
+        <span>الطلاب</span>
+      </button>
+    </nav>
+
+    <!-- Pages -->
+    <main class="main-content">
+      <!-- Scan Page -->
+      <section id="page-scan" class="page active">
+        <div class="page-header">
+          <h2><i class="fas fa-qrcode"></i> مسح رمز الحضور</h2>
+          <p>وجّه الكاميرا نحو كارت الطالب</p>
+        </div>
+        <div id="reader-container" class="reader-container">
+          <div id="reader"></div>
+          <div id="scan-result" class="scan-result hidden"></div>
+        </div>
+        <div class="scan-controls">
+          <button id="start-scan-btn" class="btn btn-primary btn-lg">
+            <i class="fas fa-camera"></i> بدء المسح
+          </button>
+          <button id="stop-scan-btn" class="btn btn-secondary btn-lg hidden">
+            <i class="fas fa-stop"></i> إيقاف
+          </button>
+        </div>
+        <div class="recent-scans" id="recent-scans">
+          <h3>آخر المسوحات</h3>
+          <div id="recent-list" class="list"></div>
+        </div>
+      </section>
+
+      <!-- Manual Page -->
+      <section id="page-manual" class="page">
+        <div class="page-header">
+          <h2><i class="fas fa-edit"></i> تسجيل يدوي</h2>
+          <p>اختر الطالب وسجّل حضوره</p>
+        </div>
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="manual-search" placeholder="ابحث عن طالب...">
+        </div>
+        <div id="manual-students-list" class="students-grid"></div>
+      </section>
+
+      <!-- Today Page -->
+      <section id="page-today" class="page">
+        <div class="page-header">
+          <h2><i class="fas fa-calendar-day"></i> سجل اليوم</h2>
+          <div class="stats-row">
+            <div class="stat-card present">
+              <span class="stat-num" id="stat-present">0</span>
+              <span class="stat-label">حاضر</span>
+            </div>
+            <div class="stat-card absent">
+              <span class="stat-num" id="stat-absent">0</span>
+              <span class="stat-label">غائب</span>
+            </div>
+            <div class="stat-card total">
+              <span class="stat-num" id="stat-total">0</span>
+              <span class="stat-label">الإجمالي</span>
+            </div>
+          </div>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-btn active" data-filter="all">الكل</button>
+          <button class="filter-btn" data-filter="present">حاضر</button>
+          <button class="filter-btn" data-filter="absent">غائب</button>
+        </div>
+        <div id="today-list" class="list"></div>
+        <button id="export-today-btn" class="btn btn-outline btn-block">
+          <i class="fas fa-download"></i> تصدير سجل اليوم
+        </button>
+      </section>
+
+      <!-- Students Page -->
+      <section id="page-students" class="page">
+        <div class="page-header">
+          <h2><i class="fas fa-users"></i> إدارة الطلاب</h2>
+          <button id="add-student-btn" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> إضافة
+          </button>
+        </div>
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="students-search" placeholder="ابحث عن طالب...">
+        </div>
+        <div id="students-list" class="list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Side Menu -->
+  <div id="side-menu" class="side-menu">
+    <div class="side-menu-header">
+      <div class="logo-circle small">
+        <i class="fas fa-check-double"></i>
+      </div>
+      <h3>يقين</h3>
+      <button id="close-menu" class="icon-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <ul class="menu-list">
+      <li data-action="history"><i class="fas fa-history"></i> سجل الحضور</li>
+      <li data-action="export"><i class="fas fa-file-export"></i> تصدير البيانات</li>
+      <li data-action="import"><i class="fas fa-file-import"></i> استيراد بيانات</li>
+      <li data-action="backup"><i class="fas fa-database"></i> نسخ احتياطي</li>
+      <li data-action="change-pin"><i class="fas fa-key"></i> تغيير الرمز</li>
+      <li data-action="clear-data" class="danger"><i class="fas fa-trash"></i> مسح كل البيانات</li>
+      <li data-action="about"><i class="fas fa-info-circle"></i> حول التطبيق</li>
+    </ul>
+  </div>
+  <div id="menu-overlay" class="overlay"></div>
+
+  <!-- Modals -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button class="modal-close icon-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "name": "يقين - نظام الحضور المحلي",
+  "short_name": "يقين",
+  "description": "نظام تسجيل الحضور والانصراف للمدارس والمراكز التعليمية - تخزين محلي بالكامل",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1e3a5f",
+  "theme_color": "#1e3a5f",
+  "dir": "rtl",
+  "lang": "ar",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "مسح QR Code",
+      "short_name": "QR",
+      "description": "فتح ماسح QR Code لتسجيل الحضور",
+      "url": "./index.html#scan"
+    },
+    {
+      "name": "تسجيل الحضور",
+      "short_name": "الحضور",
+      "description": "تسجيل حضور الطلاب يدوياً",
+      "url": "./index.html#manual"
+    },
+    {
+      "name": "سجل اليوم",
+      "short_name": "اليوم",
+      "description": "عرض سجل حضور اليوم",
+      "url": "./index.html#today"
+    }
+  ]
+}
